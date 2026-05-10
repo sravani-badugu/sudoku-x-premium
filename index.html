@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="description" content="Premium Sudoku Puzzle Generator — Play Easy, Medium, or Hard puzzles with a beautiful glassmorphism UI, timer, and confetti win animations." />
+  <meta name="keywords" content="sudoku, puzzle, game, generator, logic" />
+  <title>SudokuX — Premium Puzzle Generator</title>
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet" />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="style.css" />
+
+  <!-- Favicon (inline SVG as data URI) -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧩</text></svg>" />
+</head>
+<body>
+
+  <!-- ─── Animated Background Orbs ─────────────────────────────── -->
+  <div class="bg-orbs" aria-hidden="true">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <!-- ─── Confetti Container ────────────────────────────────────── -->
+  <div id="confetti-container" aria-hidden="true"></div>
+
+  <!-- ─── Win Modal ─────────────────────────────────────────────── -->
+  <div id="win-modal" class="modal-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="win-title">
+    <div class="modal-card">
+      <div class="modal-emoji">🏆</div>
+      <h2 id="win-title">Puzzle Solved!</h2>
+      <p id="win-message">Excellent work!</p>
+      <div class="modal-stats">
+        <div class="stat-item">
+          <span class="stat-label">Time</span>
+          <span id="modal-time" class="stat-value">00:00</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Difficulty</span>
+          <span id="modal-difficulty" class="stat-value">Easy</span>
+        </div>
+        <div class="stat-item">
+          <span class="stat-label">Mistakes</span>
+          <span id="modal-mistakes" class="stat-value">0</span>
+        </div>
+      </div>
+      <button id="modal-new-game" class="btn btn-primary" aria-label="Start a new game">New Game</button>
+    </div>
+  </div>
+
+  <!-- ─── Main App ──────────────────────────────────────────────── -->
+  <div class="app-wrapper">
+
+    <!-- Header -->
+    <header class="app-header">
+      <div class="brand">
+        <span class="brand-icon">🧩</span>
+        <h1 class="brand-name">SudokuX</h1>
+      </div>
+      <div class="header-controls">
+        <!-- Theme Toggle -->
+        <button id="theme-toggle" class="icon-btn" aria-label="Toggle dark/light mode" title="Toggle theme">
+          <span id="theme-icon">☀️</span>
+        </button>
+        <!-- Sound Toggle -->
+        <button id="sound-toggle" class="icon-btn" aria-label="Toggle sound effects" title="Toggle sound">
+          <span id="sound-icon">🔊</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="app-main">
+
+      <!-- ─── Left Panel: Controls ─────────────────────────── -->
+      <aside class="control-panel glass-card" aria-label="Game controls">
+
+        <!-- Difficulty Selector -->
+        <section class="panel-section" aria-labelledby="difficulty-label">
+          <h2 id="difficulty-label" class="section-title">Difficulty</h2>
+          <div class="difficulty-group" role="group" aria-label="Select difficulty">
+            <button class="diff-btn active" data-difficulty="easy"   id="btn-easy"   aria-pressed="true">Easy</button>
+            <button class="diff-btn"        data-difficulty="medium" id="btn-medium" aria-pressed="false">Medium</button>
+            <button class="diff-btn"        data-difficulty="hard"   id="btn-hard"   aria-pressed="false">Hard</button>
+          </div>
+        </section>
+
+        <!-- Timer -->
+        <section class="panel-section" aria-labelledby="timer-label">
+          <h2 id="timer-label" class="section-title">Timer</h2>
+          <div class="timer-display glass-inner" aria-live="polite" aria-label="Elapsed time">
+            <span id="timer">00:00</span>
+          </div>
+        </section>
+
+        <!-- Stats -->
+        <section class="panel-section" aria-labelledby="stats-label">
+          <h2 id="stats-label" class="section-title">Session</h2>
+          <div class="stats-grid">
+            <div class="stat-badge">
+              <span class="stat-badge-value" id="mistakes-count">0</span>
+              <span class="stat-badge-label">Mistakes</span>
+            </div>
+            <div class="stat-badge">
+              <span class="stat-badge-value" id="hints-used">0</span>
+              <span class="stat-badge-label">Hints Used</span>
+            </div>
+          </div>
+        </section>
+
+        <!-- Number Pad -->
+        <section class="panel-section" aria-labelledby="numpad-label">
+          <h2 id="numpad-label" class="section-title">Number Pad</h2>
+          <div class="numpad" role="group" aria-label="Number pad">
+            <button class="num-btn" data-num="1" aria-label="Enter 1">1</button>
+            <button class="num-btn" data-num="2" aria-label="Enter 2">2</button>
+            <button class="num-btn" data-num="3" aria-label="Enter 3">3</button>
+            <button class="num-btn" data-num="4" aria-label="Enter 4">4</button>
+            <button class="num-btn" data-num="5" aria-label="Enter 5">5</button>
+            <button class="num-btn" data-num="6" aria-label="Enter 6">6</button>
+            <button class="num-btn" data-num="7" aria-label="Enter 7">7</button>
+            <button class="num-btn" data-num="8" aria-label="Enter 8">8</button>
+            <button class="num-btn" data-num="9" aria-label="Enter 9">9</button>
+            <button class="num-btn erase-btn" data-num="0" aria-label="Erase cell">⌫</button>
+          </div>
+        </section>
+
+        <!-- Action Buttons -->
+        <section class="panel-section actions" aria-labelledby="actions-label">
+          <h2 id="actions-label" class="sr-only">Actions</h2>
+          <button id="btn-hint"      class="btn btn-secondary" aria-label="Get a hint">💡 Hint</button>
+          <button id="btn-check"     class="btn btn-secondary" aria-label="Check your solution">✅ Check</button>
+          <button id="btn-restart"   class="btn btn-outline"   aria-label="Restart the current puzzle">🔄 Restart</button>
+          <button id="btn-new-game"  class="btn btn-primary"   aria-label="Start a new game">✨ New Game</button>
+        </section>
+
+      </aside>
+
+      <!-- ─── Center: Sudoku Grid ──────────────────────────── -->
+      <section class="grid-panel" aria-label="Sudoku puzzle grid">
+        <div class="grid-header">
+          <span id="puzzle-label" class="puzzle-label">Easy Puzzle</span>
+          <span id="progress-text" class="progress-text">0 / 81</span>
+        </div>
+
+        <!-- Progress Bar -->
+        <div class="progress-bar-wrapper" role="progressbar" aria-valuemin="0" aria-valuemax="81" aria-valuenow="0" aria-label="Puzzle completion">
+          <div id="progress-bar" class="progress-bar"></div>
+        </div>
+
+        <!-- The 9×9 Grid — cells injected by JS -->
+        <div id="sudoku-grid" class="sudoku-grid" role="grid" aria-label="Sudoku 9x9 grid"></div>
+
+        <!-- Feedback toast -->
+        <div id="toast" class="toast hidden" aria-live="assertive" role="alert"></div>
+      </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="app-footer">
+      <p>Built with ❤️ using Vanilla JS &nbsp;·&nbsp; <span id="saved-indicator" class="saved-indicator">Progress auto-saved</span></p>
+    </footer>
+
+  </div><!-- /.app-wrapper -->
+
+  <!-- Script -->
+  <script src="script.js"></script>
+</body>
+</html>

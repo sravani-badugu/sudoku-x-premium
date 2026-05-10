@@ -1,0 +1,475 @@
+/* ============================================================
+   SudokuX — Premium Sudoku Puzzle Generator
+   style.css  |  Glassmorphism + Dark/Light theme
+   ============================================================ */
+
+/* ── 1. CSS Custom Properties (Design Tokens) ─────────────── */
+:root {
+  /* Dark theme (default) */
+  --bg-base:        #0d0d1a;
+  --bg-surface:     rgba(255,255,255,0.05);
+  --bg-inner:       rgba(255,255,255,0.03);
+  --border-color:   rgba(255,255,255,0.10);
+  --border-strong:  rgba(255,255,255,0.18);
+  --text-primary:   #f0f0ff;
+  --text-secondary: #9898bb;
+  --text-muted:     #5a5a7a;
+  --accent:         #7c6cf8;
+  --accent-hover:   #9b8dfb;
+  --accent-glow:    rgba(124,108,248,0.35);
+  --success:        #34d399;
+  --error:          #f87171;
+  --warning:        #fbbf24;
+  --given-color:    #c4c4ff;
+  --user-color:     #a5f3fc;
+  --orb-1:          #7c6cf8;
+  --orb-2:          #06b6d4;
+  --orb-3:          #ec4899;
+  --shadow:         0 8px 32px rgba(0,0,0,0.45);
+  --radius-card:    20px;
+  --radius-btn:     12px;
+  --radius-cell:    8px;
+  --transition:     0.25s cubic-bezier(0.4,0,0.2,1);
+}
+
+[data-theme="light"] {
+  --bg-base:        #f0f0ff;
+  --bg-surface:     rgba(255,255,255,0.65);
+  --bg-inner:       rgba(255,255,255,0.40);
+  --border-color:   rgba(100,80,200,0.15);
+  --border-strong:  rgba(100,80,200,0.30);
+  --text-primary:   #1a1a3a;
+  --text-secondary: #4a4a7a;
+  --text-muted:     #8888aa;
+  --accent:         #6c5ce7;
+  --accent-hover:   #5a4ad1;
+  --accent-glow:    rgba(108,92,231,0.25);
+  --given-color:    #3730a3;
+  --user-color:     #0e7490;
+  --shadow:         0 8px 32px rgba(80,60,200,0.12);
+  --orb-1:          #a78bfa;
+  --orb-2:          #67e8f9;
+  --orb-3:          #f9a8d4;
+}
+
+/* ── 2. Reset & Base ───────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: var(--bg-base);
+  color: var(--text-primary);
+  min-height: 100vh;
+  overflow-x: hidden;
+  transition: background var(--transition), color var(--transition);
+}
+
+/* Screen-reader only */
+.sr-only {
+  position: absolute; width: 1px; height: 1px;
+  padding: 0; margin: -1px; overflow: hidden;
+  clip: rect(0,0,0,0); white-space: nowrap; border: 0;
+}
+
+/* ── 3. Animated Background Orbs ──────────────────────────── */
+.bg-orbs {
+  position: fixed; inset: 0; pointer-events: none; z-index: 0; overflow: hidden;
+}
+.orb {
+  position: absolute; border-radius: 50%;
+  filter: blur(80px); opacity: 0.25;
+  animation: float 12s ease-in-out infinite alternate;
+}
+.orb-1 { width: 500px; height: 500px; background: var(--orb-1); top: -150px; left: -150px; animation-duration: 14s; }
+.orb-2 { width: 400px; height: 400px; background: var(--orb-2); bottom: -100px; right: -100px; animation-duration: 10s; animation-delay: -4s; }
+.orb-3 { width: 350px; height: 350px; background: var(--orb-3); top: 40%; left: 50%; transform: translate(-50%,-50%); animation-duration: 16s; animation-delay: -8s; }
+
+@keyframes float {
+  from { transform: translate(0, 0) scale(1); }
+  to   { transform: translate(30px, 20px) scale(1.08); }
+}
+.orb-3 {
+  animation-name: float3;
+}
+@keyframes float3 {
+  from { transform: translate(-50%,-50%) scale(1); }
+  to   { transform: translate(-50%,-50%) scale(1.12) translate(20px,-15px); }
+}
+
+/* ── 4. Layout ─────────────────────────────────────────────── */
+.app-wrapper {
+  position: relative; z-index: 1;
+  display: flex; flex-direction: column;
+  min-height: 100vh;
+  max-width: 1200px; margin: 0 auto;
+  padding: 0 16px 24px;
+}
+
+.app-main {
+  display: flex; gap: 24px; flex: 1;
+  align-items: flex-start;
+  padding: 16px 0;
+}
+
+/* ── 5. Header ─────────────────────────────────────────────── */
+.app-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 20px 0 12px;
+  border-bottom: 1px solid var(--border-color);
+  margin-bottom: 4px;
+}
+.brand { display: flex; align-items: center; gap: 10px; }
+.brand-icon { font-size: 1.8rem; filter: drop-shadow(0 0 8px var(--accent-glow)); }
+.brand-name {
+  font-size: 1.6rem; font-weight: 800; letter-spacing: -0.5px;
+  background: linear-gradient(135deg, var(--accent), #06b6d4);
+  -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+.header-controls { display: flex; gap: 8px; }
+.icon-btn {
+  width: 42px; height: 42px; border-radius: 12px; border: 1px solid var(--border-color);
+  background: var(--bg-surface); color: var(--text-primary);
+  font-size: 1.1rem; cursor: pointer; transition: all var(--transition);
+  backdrop-filter: blur(10px);
+  display: flex; align-items: center; justify-content: center;
+}
+.icon-btn:hover { background: var(--accent-glow); border-color: var(--accent); transform: scale(1.08); }
+
+/* ── 6. Glass Card ─────────────────────────────────────────── */
+.glass-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-card);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: var(--shadow);
+  transition: background var(--transition), border-color var(--transition);
+}
+.glass-inner {
+  background: var(--bg-inner);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  backdrop-filter: blur(8px);
+}
+
+/* ── 7. Control Panel (Left) ───────────────────────────────── */
+.control-panel {
+  width: 260px; flex-shrink: 0;
+  padding: 20px;
+  display: flex; flex-direction: column; gap: 20px;
+  position: sticky; top: 20px;
+}
+
+.panel-section {}
+.section-title {
+  font-size: 0.7rem; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--text-muted);
+  margin-bottom: 10px;
+}
+
+/* Difficulty Buttons */
+.difficulty-group { display: flex; gap: 6px; }
+.diff-btn {
+  flex: 1; padding: 8px 4px; border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-inner); color: var(--text-secondary);
+  font-size: 0.78rem; font-weight: 600; cursor: pointer;
+  transition: all var(--transition);
+}
+.diff-btn:hover { border-color: var(--accent); color: var(--accent); }
+.diff-btn.active {
+  background: var(--accent); border-color: var(--accent);
+  color: #fff; box-shadow: 0 0 16px var(--accent-glow);
+}
+
+/* Timer */
+.timer-display {
+  text-align: center; padding: 14px;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 2rem; font-weight: 600; letter-spacing: 0.08em;
+  color: var(--accent);
+  text-shadow: 0 0 20px var(--accent-glow);
+}
+
+/* Stats Grid */
+.stats-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.stat-badge {
+  background: var(--bg-inner); border: 1px solid var(--border-color);
+  border-radius: 12px; padding: 12px 8px; text-align: center;
+}
+.stat-badge-value { display: block; font-size: 1.4rem; font-weight: 700; color: var(--accent); }
+.stat-badge-label { font-size: 0.65rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; }
+
+/* Number Pad */
+.numpad {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px;
+}
+.num-btn {
+  aspect-ratio: 1; border-radius: 10px;
+  border: 1px solid var(--border-color);
+  background: var(--bg-inner); color: var(--text-primary);
+  font-size: 1rem; font-weight: 700; cursor: pointer;
+  transition: all var(--transition);
+  display: flex; align-items: center; justify-content: center;
+}
+.num-btn:hover { background: var(--accent-glow); border-color: var(--accent); color: var(--accent); transform: scale(1.06); }
+.num-btn:active { transform: scale(0.95); }
+.erase-btn { grid-column: span 3; aspect-ratio: auto; padding: 10px; font-size: 0.9rem; }
+
+/* Action Buttons */
+.actions { display: flex; flex-direction: column; gap: 8px; }
+.btn {
+  width: 100%; padding: 11px 16px; border-radius: var(--radius-btn);
+  font-family: 'Inter', sans-serif; font-size: 0.85rem; font-weight: 600;
+  cursor: pointer; transition: all var(--transition);
+  border: 1px solid transparent;
+  display: flex; align-items: center; justify-content: center; gap: 6px;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent), #06b6d4);
+  color: #fff; border-color: transparent;
+  box-shadow: 0 4px 20px var(--accent-glow);
+}
+.btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 28px var(--accent-glow); }
+.btn-secondary {
+  background: var(--bg-inner); color: var(--text-primary);
+  border-color: var(--border-color);
+}
+.btn-secondary:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-glow); }
+.btn-outline {
+  background: transparent; color: var(--text-secondary);
+  border-color: var(--border-color);
+}
+.btn-outline:hover { border-color: var(--error); color: var(--error); }
+.btn:active { transform: scale(0.97); }
+
+/* ── 8. Grid Panel (Center) ────────────────────────────────── */
+.grid-panel {
+  flex: 1; display: flex; flex-direction: column; gap: 12px;
+  align-items: center;
+}
+.grid-header {
+  width: 100%; display: flex; justify-content: space-between; align-items: center;
+  padding: 0 4px;
+}
+.puzzle-label { font-size: 0.9rem; font-weight: 700; color: var(--text-secondary); letter-spacing: 0.05em; }
+.progress-text { font-size: 0.8rem; color: var(--text-muted); font-family: 'JetBrains Mono', monospace; }
+
+/* Progress Bar */
+.progress-bar-wrapper {
+  width: 100%; height: 6px; background: var(--bg-inner);
+  border-radius: 999px; overflow: hidden;
+  border: 1px solid var(--border-color);
+}
+.progress-bar {
+  height: 100%; width: 0%;
+  background: linear-gradient(90deg, var(--accent), #06b6d4);
+  border-radius: 999px;
+  transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+  box-shadow: 0 0 8px var(--accent-glow);
+}
+
+/* ── 9. Sudoku Grid ────────────────────────────────────────── */
+.sudoku-grid {
+  display: grid;
+  grid-template-columns: repeat(9, 1fr);
+  gap: 2px;
+  width: min(520px, 94vw);
+  aspect-ratio: 1;
+  background: var(--bg-surface);
+  border: 2px solid var(--border-strong);
+  border-radius: 16px;
+  padding: 6px;
+  box-shadow: var(--shadow), 0 0 40px rgba(124,108,248,0.08);
+  backdrop-filter: blur(12px);
+}
+
+/* Each Cell */
+.cell {
+  display: flex; align-items: center; justify-content: center;
+  font-size: clamp(0.85rem, 2.5vw, 1.15rem);
+  font-weight: 600;
+  border-radius: var(--radius-cell);
+  cursor: pointer;
+  transition: all var(--transition);
+  background: var(--bg-inner);
+  border: 1px solid transparent;
+  position: relative;
+  user-select: none;
+  -webkit-user-select: none;
+  color: var(--text-primary);
+  outline: none;
+  aspect-ratio: 1;
+}
+
+/* 3×3 Box thick borders using nth-child */
+/* Right border of columns 3 and 6 */
+.cell:nth-child(3n) { border-right: 2px solid var(--border-strong); border-radius: var(--radius-cell) 0 0 var(--radius-cell); }
+/* Left border is handled by adjacent */
+.cell:nth-child(3n+1):not(:nth-child(1)):not(:nth-child(10)):not(:nth-child(19)):not(:nth-child(28)):not(:nth-child(37)):not(:nth-child(46)):not(:nth-child(55)):not(:nth-child(64)):not(:nth-child(73)) {
+  border-left: 2px solid var(--border-strong);
+}
+/* Bottom border of rows 3 and 6 */
+.cell:nth-child(n+19):nth-child(-n+27),
+.cell:nth-child(n+46):nth-child(-n+54) {
+  border-bottom: 2px solid var(--border-strong);
+}
+
+/* Given (pre-filled) cells */
+.cell.given {
+  color: var(--given-color);
+  font-weight: 700;
+  background: rgba(124,108,248,0.06);
+  cursor: default;
+}
+
+/* User-filled cells */
+.cell.user-filled { color: var(--user-color); }
+
+/* Selected cell */
+.cell.selected {
+  background: rgba(124,108,248,0.20);
+  border-color: var(--accent) !important;
+  box-shadow: 0 0 0 2px var(--accent-glow), inset 0 0 8px rgba(124,108,248,0.15);
+  z-index: 2;
+}
+
+/* Same number highlight */
+.cell.same-number { background: rgba(124,108,248,0.10); }
+
+/* Same row/col/box highlight */
+.cell.highlighted { background: rgba(255,255,255,0.04); }
+
+/* Error cell */
+.cell.error {
+  color: var(--error) !important;
+  background: rgba(248,113,113,0.12) !important;
+  border-color: var(--error) !important;
+  animation: shake 0.35s ease;
+}
+
+/* Correct animation */
+.cell.correct-flash {
+  animation: correctFlash 0.5s ease;
+}
+
+@keyframes shake {
+  0%,100% { transform: translateX(0); }
+  20% { transform: translateX(-4px); }
+  60% { transform: translateX(4px); }
+}
+@keyframes correctFlash {
+  0% { background: rgba(52,211,153,0.0); }
+  50% { background: rgba(52,211,153,0.30); }
+  100% { background: transparent; }
+}
+
+/* Cell hover */
+.cell:not(.given):hover {
+  background: rgba(124,108,248,0.12);
+  border-color: var(--border-strong);
+}
+
+/* Notes mode (small digits) */
+.cell .notes-grid {
+  display: grid; grid-template-columns: repeat(3,1fr);
+  width: 100%; height: 100%;
+  font-size: clamp(0.35rem, 1vw, 0.5rem);
+  font-weight: 400; color: var(--text-muted);
+  line-height: 1; padding: 1px;
+}
+.cell .notes-grid span { display: flex; align-items: center; justify-content: center; }
+
+/* ── 10. Toast Notification ────────────────────────────────── */
+.toast {
+  position: fixed; bottom: 32px; left: 50%; transform: translateX(-50%) translateY(10px);
+  background: var(--bg-surface); border: 1px solid var(--border-strong);
+  backdrop-filter: blur(20px); padding: 12px 24px;
+  border-radius: 999px; font-size: 0.85rem; font-weight: 600;
+  color: var(--text-primary); box-shadow: var(--shadow);
+  opacity: 0; transition: all 0.35s cubic-bezier(0.4,0,0.2,1);
+  z-index: 100; pointer-events: none; white-space: nowrap;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+.toast.hidden { display: none; }
+.toast.success { border-color: var(--success); color: var(--success); }
+.toast.error-toast { border-color: var(--error); color: var(--error); }
+.toast.info { border-color: var(--accent); color: var(--accent); }
+
+/* ── 11. Win Modal ─────────────────────────────────────────── */
+.modal-overlay {
+  position: fixed; inset: 0; z-index: 200;
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(8px);
+  display: flex; align-items: center; justify-content: center;
+  animation: fadeIn 0.3s ease;
+}
+.modal-overlay.hidden { display: none; }
+@keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.modal-card {
+  background: var(--bg-surface);
+  border: 1px solid var(--border-strong);
+  border-radius: 24px; padding: 40px 36px;
+  backdrop-filter: blur(24px);
+  text-align: center; max-width: 380px; width: 90%;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.5);
+  animation: slideUp 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes slideUp {
+  from { transform: translateY(40px) scale(0.92); opacity: 0; }
+  to   { transform: translateY(0) scale(1); opacity: 1; }
+}
+.modal-emoji { font-size: 3.5rem; margin-bottom: 12px; animation: bounce 1s ease infinite alternate; }
+@keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-8px); } }
+.modal-card h2 { font-size: 1.8rem; font-weight: 800; margin-bottom: 6px; color: var(--text-primary); }
+.modal-card p { color: var(--text-secondary); margin-bottom: 20px; font-size: 0.9rem; }
+.modal-stats { display: flex; gap: 12px; justify-content: center; margin-bottom: 24px; }
+.stat-item { background: var(--bg-inner); border: 1px solid var(--border-color); border-radius: 12px; padding: 12px 16px; }
+.stat-label { display: block; font-size: 0.65rem; color: var(--text-muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 4px; }
+.stat-value { display: block; font-size: 1.1rem; font-weight: 700; color: var(--accent); font-family: 'JetBrains Mono', monospace; }
+#modal-new-game { width: 100%; padding: 14px; }
+
+/* ── 12. Confetti ──────────────────────────────────────────── */
+#confetti-container {
+  position: fixed; inset: 0; pointer-events: none; z-index: 190; overflow: hidden;
+}
+.confetti-piece {
+  position: absolute; top: -20px;
+  width: 10px; height: 10px;
+  border-radius: 2px;
+  animation: confettiFall linear forwards;
+}
+@keyframes confettiFall {
+  0%   { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+  100% { transform: translateY(110vh) rotate(720deg); opacity: 0; }
+}
+
+/* ── 13. Footer ────────────────────────────────────────────── */
+.app-footer {
+  text-align: center; padding: 16px 0 4px;
+  font-size: 0.75rem; color: var(--text-muted);
+  border-top: 1px solid var(--border-color); margin-top: auto;
+}
+.saved-indicator { color: var(--success); font-weight: 600; }
+
+/* ── 14. Responsive ────────────────────────────────────────── */
+@media (max-width: 820px) {
+  .app-main { flex-direction: column; align-items: center; gap: 16px; }
+  .control-panel { width: 100%; max-width: 520px; position: static; }
+  .difficulty-group { gap: 8px; }
+  .numpad { grid-template-columns: repeat(5, 1fr); }
+  .erase-btn { grid-column: span 1; aspect-ratio: 1; }
+  .actions { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+  .btn-primary { grid-column: span 2; }
+}
+
+@media (max-width: 480px) {
+  .brand-name { font-size: 1.3rem; }
+  .sudoku-grid { padding: 4px; gap: 1px; }
+  .cell { border-radius: 5px; font-size: 0.8rem; }
+  .numpad { grid-template-columns: repeat(5, 1fr); gap: 5px; }
+}
