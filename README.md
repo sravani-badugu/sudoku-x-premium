@@ -25,7 +25,7 @@ SudokuX is a high-performance, modern Sudoku application built with pure Vanilla
 
 1. **Clone the repository**:
    ```bash
-   git clone https://github.com/YOUR_USERNAME/sudoku-x-premium.git
+   git clone https://github.com/sravani-badugu/sudoku-x-premium.git
    ```
 2. **Navigate to the project folder**:
    ```bash
